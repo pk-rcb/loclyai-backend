@@ -56,9 +56,12 @@ async function setup() {
         user_id UUID NOT NULL,
         user_type VARCHAR(50) NOT NULL,
         token TEXT NOT NULL,
+        expires_at TIMESTAMPTZ,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
+    // Hotfix: Ensure expires_at exists if the table was already created without it
+    await pool.query('ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;');
 
     console.log('Creating reports table...');
     await pool.query(`

@@ -7,7 +7,7 @@ import pool from '../config/db.js';
 export function generateAccessToken(user) {
   return jwt.sign(
     { id: user.id, email: user.email, type: user.type },
-    process.env.ACCESS_TOKEN_SECRET,
+    process.env.ACCESS_TOKEN_SECRET || 'fallback_access_secret_123',
     { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || '15m' }
   );
 }
@@ -18,7 +18,7 @@ export function generateAccessToken(user) {
 export async function generateRefreshToken(user) {
   const token = jwt.sign(
     { id: user.id, type: user.type },
-    process.env.REFRESH_TOKEN_SECRET,
+    process.env.REFRESH_TOKEN_SECRET || 'fallback_refresh_secret_123',
     { expiresIn: process.env.REFRESH_TOKEN_EXPIRY || '7d' }
   );
 
