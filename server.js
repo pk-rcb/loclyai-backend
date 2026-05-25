@@ -15,8 +15,8 @@ const app = express();
 
 // ─── MIDDLEWARE ──────────────────────────────────────────
 app.use(cors({
-  origin: 'http://localhost:5173',   // Vite dev server
-  credentials: true,                 // Allow cookies
+  origin: (origin, callback) => callback(null, true), // Allow Vercel and Localhost dynamically
+  credentials: true,                                  // Allow cookies
 }));
 app.use(express.json());
 app.use(cookieParser());
