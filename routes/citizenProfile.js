@@ -12,7 +12,7 @@ router.use(authenticateToken);
 router.get('/profile', async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT id, full_name, email, phone, created_at, updated_at FROM citizens WHERE id = $1',
+      'SELECT id, full_name, email, phone, created_at FROM citizens WHERE id = $1',
       [req.user.id]
     );
 
@@ -28,7 +28,6 @@ router.get('/profile', async (req, res) => {
         email: citizen.email,
         phone: citizen.phone,
         createdAt: citizen.created_at,
-        updatedAt: citizen.updated_at,
         type: 'citizen',
       },
     });
@@ -48,9 +47,9 @@ router.put('/profile', async (req, res) => {
     }
 
     const result = await pool.query(
-      `UPDATE citizens SET full_name = $1, phone = $2, updated_at = NOW()
+      `UPDATE citizens SET full_name = $1, phone = $2
        WHERE id = $3
-       RETURNING id, full_name, email, phone, created_at, updated_at`,
+       RETURNING id, full_name, email, phone, created_at`,
       [fullName.trim(), phone.trim(), req.user.id]
     );
 
@@ -67,7 +66,6 @@ router.put('/profile', async (req, res) => {
         email: citizen.email,
         phone: citizen.phone,
         createdAt: citizen.created_at,
-        updatedAt: citizen.updated_at,
         type: 'citizen',
       },
     });
@@ -109,7 +107,7 @@ router.put('/change-password', async (req, res) => {
     // Hash new password and update
     const newHash = await bcrypt.hash(newPassword, 12);
     await pool.query(
-      'UPDATE citizens SET password_hash = $1, updated_at = NOW() WHERE id = $2',
+      'UPDATE citizens SET password_hash = $1 WHERE id = $2',
       [newHash, req.user.id]
     );
 

@@ -7,15 +7,7 @@ import { authenticateToken, requireRole } from '../middleware/auth.js';
 const router = Router();
 
 // ─── MULTER SETUP ────────────────────────────────────────
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'report-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // Helper: Reverse Geocode via Nominatim
@@ -47,7 +39,8 @@ router.post('/', authenticateToken, requireRole('citizen'), upload.single('image
       return res.status(400).json({ error: 'GPS coordinates are required.' });
     }
 
-    const imageUrl = `/uploads/${req.file.filename}`;
+    const base64Image = req.file.buffer.toString('base64');
+    const imageUrl = `data:${req.file.mimetype};base64,${base64Image}`;
     
     // Reverse Geocoding — get full data
     const geoData = await reverseGeocode(latitude, longitude);
